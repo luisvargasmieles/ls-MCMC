@@ -11,8 +11,6 @@ function [logPiTrace,mse_from_burnIn,mse_stationarity,...
 % 'obs_vector'                  : observation vector
 %           
 % 'operator'                    : linear operator A
-%
-% 'blurring_fourier_operator'   : linear operator A (in the Fourier domain)
 %           
 % 'transpose_operator'          : transpose of the linear operator A
 %           
@@ -109,6 +107,7 @@ meanSamplesSGS_burnIn = Zk; % mean from burn-in stage
 mse_from_burnIn = zeros(1,nSamples + nBurnIn);
 perc = round(nBurnIn/10); % to show the progress percentage of burn-in
 
+disp("Starting the execution of the MCMC method")
 fprintf("Running burn-in stage     \n");
 tic;
 for i=2:nBurnIn

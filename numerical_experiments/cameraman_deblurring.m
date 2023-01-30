@@ -1,4 +1,4 @@
-function [X, Y, sigma, A, At, AtA, invQ] = cameraman_deconvolution()
+function [X, Y, sigma, A, At, AtA, invQ] = cameraman_deblurring()
 %
 % function to produce the necessary data to perform the cameraman
 % deconvolution experiment

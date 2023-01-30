@@ -11,8 +11,6 @@ function [logPiTrace,mse_from_burnIn,mse_stationarity,...
 % 'obs_vector'                  : observation vector
 %           
 % 'operator'                    : linear operator A
-%           
-% 'blurring_fourier_operator'   : linear operator A (in the Fourier domain)
 % 
 % 'transpose_operator'          : transpose of the linear operator A
 %           
@@ -61,9 +59,9 @@ function [logPiTrace,mse_from_burnIn,mse_stationarity,...
 for i = 1:2:(length(varargin)-1)
     switch upper(varargin{i})
         case 'TRUE_IMG'
-            x          = varargin{i+1};
+            X          = varargin{i+1};
         case 'OBS_VECTOR'
-            y          = varargin{i+1};
+            Y          = varargin{i+1};
         case 'OPERATOR'
             A          = varargin{i+1};
         case 'INVERSE_PRECISION_MATRIX'
@@ -96,11 +94,11 @@ invQ = @(x) invQ(x,rho2);
 % Gradients functions and Log(Pi) generator function
 proxG = @(x) chambolle_prox_TV_stop(x, 'lambda',alpha*lambdaProx,...
                                        'maxiter',20);
-logPi = @(x) -(norm(y-A(x),'fro')^2)/(2*(sigma^2)) -alpha*TVnorm(x);
+logPi = @(x) -(norm(Y-A(x),'fro')^2)/(2*(sigma^2)) -alpha*TVnorm(x);
 
 % MYULA initial conditions
-AtY = At(y);
-dim_Samples = size(x);
+AtY = At(Y);
+dim_Samples = size(X);
 dt = 1/(1/lambdaProx + 1/(rho2 + sigma^2));
 Zk = AtY;
 logPiTrace = zeros(1,nSamples + nBurnIn);
@@ -112,6 +110,7 @@ meanSamplesSGS_burnIn = Zk; % mean from burn-in stage
 mse_from_burnIn = zeros(1,nSamples + nBurnIn);
 perc = round(nBurnIn/10); % to show the progress percentage of burn-in
 
+disp("Starting the execution of the MCMC method")
 fprintf("Running burn-in stage     \n");
 tic;
 for i=2:nBurnIn
@@ -133,7 +132,7 @@ for i=2:nBurnIn
     meanSamplesSGS_burnIn = ((i-1)/i)*meanSamplesSGS_burnIn + (1/i)*Xk;
     
     %%% mse burn-in
-    mse_from_burnIn(i)=immse(meanSamplesSGS_burnIn,x);
+    mse_from_burnIn(i)=immse(meanSamplesSGS_burnIn,X);
 
     %%% to show progress of burn-in stage
     if rem(i,perc)==0
@@ -176,14 +175,14 @@ for i = 1:nSamples
         *meanSamplesSGS_burnIn + (1/(i + nBurnIn))*Xk;
     
     %%% mse burn-in
-    mse_from_burnIn(i+nBurnIn)=immse(meanSamplesSGS_burnIn,x);
+    mse_from_burnIn(i+nBurnIn)=immse(meanSamplesSGS_burnIn,X);
     
     %%% mean of the samples in stationarity
     firstMoment = ((i-1)/i)*firstMoment + (1/i)*Xk;
     %%% second moment of the samples in stationarity
     secondMoment = ((i-1)/i)*secondMoment + (1/i)*(Xk.^2);
     %%% mean square error MSE in stationarity
-    mse_stationarity(i)=immse(firstMoment,x);
+    mse_stationarity(i)=immse(firstMoment,X);
     %%% to show progress of the work
     if rem(i,perc)==0
         fprintf('\b\b\b\b%2d%%\n', round(i/perc));

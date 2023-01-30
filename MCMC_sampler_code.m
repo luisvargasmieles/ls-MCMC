@@ -28,7 +28,7 @@ rng('default');
 rng(10);
 
 % loading functions/variables/operators from numerical experiment
-[X,Y,sigma,A,At,AtA,invQ] = cameraman_deconvolution();
+[X,Y,sigma,A,At,AtA,invQ] = cameraman_deblurring();
 
 % estimating hyperparameters using
 % SAPG algorithm (see Algorithm 3.1 from paper)
@@ -43,8 +43,8 @@ rng(10);
                             'tol_rho2_param',1e-5)
 
 % MCMC sampler parameters
-nSamples_burnIn = 1e2; % burn-in number of samples (to discard)
-nSamples = 5e2; % number of samples to consider after burn-in
+nSamples_burnIn = 1.5e2; % burn-in number of samples (to discard)
+nSamples = 1.5e3; % number of samples to consider after burn-in
 lipschitz_f = 1 / sigma^2; % Lipschitz constant of the likelihood
 nStagesROCK = 15; % number of stages 's' of the (ls-)SK-ROCK method
 percDt = 0.95; % fraction of the max (ls-)SK-ROCK step-size
@@ -55,7 +55,7 @@ MYParam = sigma^2; % Moreau-Yosida approx. parameter (for prox. comp.)
     mse_from_burnIn,...
     mse_stationarity,...
     firstMoment,...
-    secondMoment] = SKROCK('true_img',X,...
+    secondMoment] = lsSKROCK('true_img',X,...
                           'obs_vector',Y,...
                           'operator',A,...
                           'transpose_operator',At,...
