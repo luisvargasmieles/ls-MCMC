@@ -1,6 +1,5 @@
-function [X, Y, sigma, A, H_FFT, At, AtA, invQ] = cameraman_deconvolution()
+function [X, Y, sigma, A, At, AtA, invQ] = cameraman_deconvolution()
 %
-% [Y, sigma, A, At, AtA] = cameraman_deconvolution()
 % function to produce the necessary data to perform the cameraman
 % deconvolution experiment
 %
@@ -14,9 +13,15 @@ function [X, Y, sigma, A, H_FFT, At, AtA, invQ] = cameraman_deconvolution()
 % 
 % A      : Linear operator
 %
+% H_FFT  : Linear operator (in the fourier domain)
+%
 % At     : Transpose of the linear operator
 %
 % AtA    : At*A operator
+%
+% invQ   : Inverse of the precision matrix
+%          Q = 1/sigma^2 * H^T *H + 1/rho^2 * I_N
+%          to compute X_grad on latent-space methods (ls-MYULA, ls-SK-ROCK)
 % 
 % ===================================================
 
@@ -26,8 +31,7 @@ function [X, Y, sigma, A, H_FFT, At, AtA, invQ] = cameraman_deconvolution()
 X = double(imread('cameraman.tif')); % Cameraman img.
 N = size(X,1); % Dimension of the image
 
-%%%% function handle for uniform blur operator (acts on the image
-%%%% coefficients)
+%%%% function handle for uniform blur operator
 h = [1 1 1 1 1];
 lh = length(h);
 h = h/sum(h);

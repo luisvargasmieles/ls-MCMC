@@ -22,7 +22,7 @@ set(0, 'defaultTextInterpreter', 'latex');
     figure(2);
     imagesc(Y, [0 255]); hold on
     axis equal; axis off;colormap('gray');
-    title('Blurred and noisy observation');
+    title('Observation $y$', 'Interpreter', 'latex');
  
     % Plot the MMSE of x
     figure(3);

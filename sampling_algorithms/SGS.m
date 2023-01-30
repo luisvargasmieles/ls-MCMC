@@ -17,7 +17,10 @@ function [logPiTrace,mse_from_burnIn,mse_stationarity,...
 % 'transpose_operator'          : transpose of the linear operator A
 %           
 % 'operator_transpose_operator' : A^T * A
-%           
+%
+% 'inverse_precision_matrix'    : inverse of the precision matrix
+%                                 Q = 1/sigma^2 * H^T *H + 1/rho^2 * I_N
+%
 % 'number_samples_burn_in'      : number of samples to consider in the
 %                                 burn-in stage
 %
@@ -62,8 +65,8 @@ for i = 1:2:(length(varargin)-1)
             Y          = varargin{i+1};
         case 'OPERATOR'
             A          = varargin{i+1};
-        case 'BLURRING_FOURIER_OPERATOR'
-            H_FFT      = varargin{i+1};
+        case 'INVERSE_PRECISION_MATRIX'
+            invQ      = varargin{i+1};
         case 'TRANSPOSE_OPERATOR'
             At         = varargin{i+1};
         case 'NUMBER_SAMPLES_BURN_IN'
@@ -84,12 +87,10 @@ end
 %--------------------------------------------------------------
 % Main body
 %--------------------------------------------------------------
-
-%%% inverse operator of the precision matrix 
+%%% Inverse of the precision matrix 
 %%% Q = 1/sigma^2 * H^T *H + 1/rho^2 * I_N
-%%% to compute X_grad on each iteration
-invQ_FFT = 1./((abs(H_FFT).^2)./sigma^2 + 1/rho2);
-invQ = @(x) real(ifft2(invQ_FFT.*fft2(x)));
+%%% only depending on the image x and not on the parameter rho2
+invQ = @(x) invQ(x,rho2);
 
 % Gradients functions and Log(Pi) generator function
 proxG = @(x) chambolle_prox_TV_stop(x, 'lambda',alpha*lambda,...
@@ -112,7 +113,7 @@ fprintf("Running burn-in stage     \n");
 tic;
 for i=2:nBurnIn
     % 1 Sampling the variable X using EPO algorithm
-    Xk = EPO_SP_deco(Y,At,sigma,Zk,rho2,invQ);
+    Xk = EPO(Y,At,sigma,Zk,rho2,invQ);
     
     % 2 Sampling the variable Z using MYULA
     Zk = Zk - dt*(Zk - Xk)/rho2 ...
@@ -150,7 +151,7 @@ fprintf("Running sampling stage     \n");
 tic;
 for i = 1:nSamples
     % 1 Sampling the variable X using EPO algorithm
-    Xk = EPO_SP_deco(Y,At,sigma,Zk,rho2,invQ);
+    Xk = EPO(Y,At,sigma,Zk,rho2,invQ);
     
     % 2 Sampling the variable Z using MYULA
     Zk = Zk - dt*(Zk - Xk)/rho2 ...
