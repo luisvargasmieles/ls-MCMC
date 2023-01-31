@@ -3,7 +3,7 @@
 %             E-PO ALGORITHM TO SAMPLE THE VARIABLE X                     %
 %-------------------------------------------------------------------------%
 
-function x = EPO_SP_deco(y,At,sigma,Z,rho2,invQ)
+function x = EPO(y,At,sigma,Z,rho2,invQ)
 
 %-------------------------------------------------------------------------%
 % This function computes the E-PO algorithm as described in the paper of C.
@@ -13,15 +13,12 @@ function x = EPO_SP_deco(y,At,sigma,Z,rho2,invQ)
 
     % INPUTS:
         % y: noisy observation (1D array).
-        % H: direct operator in the linear inverse problem y = H*x + n.
+        % At: transpose of the operator in the inverse problem y = A*x + n.
         % sigma: user-defined standard deviation of the noise.
-        % U,Z,delta: current MCMC iterates of the other variables.
-        % rho: user-defined standard deviation of the variable of 
-        %      interest x.
-        % N,M: respectively, the dimension of X (2D-array) and y
-        % (1D-array).
+        % Z: current MCMC iterates of the latent variable.
+        % rho2: augmentation parameter.
         % invQ: pre-computed covariance matrix involved in the posterior
-        % distribution of the variable of interest x.
+        %       distribution of the variable of interest x.
         
     % OUTPUT:
         % x: sample from the posterior distribution of x (2D-array).

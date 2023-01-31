@@ -13,8 +13,6 @@ function [X, Y, sigma, A, At, AtA, invQ] = cameraman_inpainting()
 % 
 % A      : Linear operator
 %
-% H_FFT  : Linear operator (in the fourier domain)
-%
 % At     : Transpose of the linear operator
 %
 % AtA    : At*A operator
